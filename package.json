@@ -2,8 +2,14 @@
   "name": "tetris",
   "version": "1.0.0",
   "description": "##### HTML・CSS・JavaScriptを使ってテトリスを作成しました。",
+  "type": "module",
   "main": "tetris.js",
   "scripts": {
+    "dev": "next dev --turbo",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,5 +21,23 @@
   "bugs": {
     "url": "https://github.com/takeshi-arihori/Tetris/issues"
   },
-  "homepage": "https://github.com/takeshi-arihori/Tetris#readme"
+  "homepage": "https://github.com/takeshi-arihori/Tetris#readme",
+  "keywords": [],
+  "dependencies": {
+    "next": "^15.4.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/node": "^24.0.14",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.31.0",
+    "eslint-config-next": "^15.4.1",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.11",
+    "typescript": "^5.8.3"
+  }
 }
