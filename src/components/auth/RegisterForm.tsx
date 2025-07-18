@@ -104,6 +104,8 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           setError('パスワードが弱すぎます。より強力なパスワードを設定してください。')
         } else if (error.message.includes('invalid email')) {
           setError('メールアドレスの形式が正しくありません。')
+        } else if (error.message.includes('rate limit exceeded')) {
+          setError('登録の試行回数が制限を超えました。しばらく待ってから再度お試しください。')
         } else {
           setError(`登録エラー: ${error.message}`)
         }
