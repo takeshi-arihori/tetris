@@ -38,27 +38,58 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
 
     try {
       const supabase = createClient()
-      const { error } = await supabase.auth.signUp({
+      
+      // まずユーザー名の重複チェック
+      const { data: existingUser } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('username', username)
+        .single()
+      
+      if (existingUser) {
+        setError('このユーザー名は既に使用されています')
+        setIsLoading(false)
+        return
+      }
+
+      // 一意のユーザー名を生成
+      const uniqueUsername = `${username}_${Date.now()}`
+      
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            username,
+            username: uniqueUsername,
           },
         },
       })
 
       if (error) {
-        // より詳細なエラーハンドリング
         console.error('Registration error:', error)
+        
+        // データベースエラーの場合は手動でプロファイルを作成
+        if (error.message.includes('Database error') && data?.user) {
+          try {
+            const userId = (data.user as any).id as string
+            if (userId) {
+              await createUserProfile(userId, uniqueUsername)
+              setMessage('登録が完了しました。確認メールをチェックしてください。')
+              onSuccess?.()
+              router.refresh()
+              return
+            }
+          } catch (profileError) {
+            console.error('Profile creation error:', profileError)
+          }
+        }
+        
         if (error.message.includes('already registered')) {
           setError('このメールアドレスは既に登録されています。')
         } else if (error.message.includes('weak password')) {
           setError('パスワードが弱すぎます。より強力なパスワードを設定してください。')
         } else if (error.message.includes('invalid email')) {
           setError('メールアドレスの形式が正しくありません。')
-        } else if (error.message.includes('Database error')) {
-          setError('データベースエラーが発生しました。しばらく経ってから再度お試しください。')
         } else {
           setError(`登録エラー: ${error.message}`)
         }
@@ -73,6 +104,38 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const createUserProfile = async (userId: string, username: string) => {
+    const supabase = createClient()
+    
+    // プロファイル作成
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .insert([{ id: userId, username }])
+    
+    if (profileError) throw profileError
+    
+    // 個人記録作成
+    const { error: bestError } = await supabase
+      .from('personal_bests')
+      .insert([{ user_id: userId }])
+    
+    if (bestError) throw bestError
+    
+    // 統計作成
+    const { error: statsError } = await supabase
+      .from('user_statistics')
+      .insert([{ user_id: userId }])
+    
+    if (statsError) throw statsError
+    
+    // 設定作成
+    const { error: settingsError } = await supabase
+      .from('user_settings')
+      .insert([{ user_id: userId }])
+    
+    if (settingsError) throw settingsError
   }
 
   return (
