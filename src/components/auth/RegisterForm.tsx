@@ -39,12 +39,18 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
     try {
       const supabase = createClient()
       
+      console.log('=== Registration Process Started ===')
+      console.log('Email:', email)
+      console.log('Username:', username)
+      
       // まずユーザー名の重複チェック
-      const { data: existingUser } = await supabase
+      const { data: existingUser, error: checkError } = await supabase
         .from('profiles')
         .select('username')
         .eq('username', username)
         .single()
+      
+      console.log('Username check result:', { existingUser, checkError })
       
       if (existingUser) {
         setError('このユーザー名は既に使用されています')
@@ -54,6 +60,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
 
       // 一意のユーザー名を生成
       const uniqueUsername = `${username}_${Date.now()}`
+      console.log('Generated unique username:', uniqueUsername)
       
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -65,15 +72,21 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
         },
       })
 
+      console.log('Auth signup result:', { data, error })
+
       if (error) {
         console.error('Registration error:', error)
         
         // データベースエラーの場合は手動でプロファイルを作成
         if (error.message.includes('Database error') && data?.user) {
+          console.log('Database error detected, attempting manual profile creation')
           try {
             const userId = (data.user as any).id as string
+            console.log('User ID from data:', userId)
+            
             if (userId) {
               await createUserProfile(userId, uniqueUsername)
+              console.log('Manual profile creation successful')
               setMessage('登録が完了しました。確認メールをチェックしてください。')
               onSuccess?.()
               router.refresh()
@@ -81,6 +94,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
             }
           } catch (profileError) {
             console.error('Profile creation error:', profileError)
+            setError('プロファイル作成中にエラーが発生しました。')
           }
         }
         
@@ -94,6 +108,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           setError(`登録エラー: ${error.message}`)
         }
       } else {
+        console.log('Registration successful')
         setMessage('登録が完了しました。確認メールをチェックしてください。')
         onSuccess?.()
         router.refresh()
@@ -109,33 +124,52 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
   const createUserProfile = async (userId: string, username: string) => {
     const supabase = createClient()
     
-    // プロファイル作成
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .insert([{ id: userId, username }])
+    console.log('=== Manual Profile Creation Started ===')
+    console.log('User ID:', userId)
+    console.log('Username:', username)
     
-    if (profileError) throw profileError
-    
-    // 個人記録作成
-    const { error: bestError } = await supabase
-      .from('personal_bests')
-      .insert([{ user_id: userId }])
-    
-    if (bestError) throw bestError
-    
-    // 統計作成
-    const { error: statsError } = await supabase
-      .from('user_statistics')
-      .insert([{ user_id: userId }])
-    
-    if (statsError) throw statsError
-    
-    // 設定作成
-    const { error: settingsError } = await supabase
-      .from('user_settings')
-      .insert([{ user_id: userId }])
-    
-    if (settingsError) throw settingsError
+    try {
+      // プロファイル作成
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .insert([{ id: userId, username }])
+        .select()
+      
+      console.log('Profile creation result:', { profileData, profileError })
+      if (profileError) throw profileError
+      
+      // 個人記録作成
+      const { data: bestData, error: bestError } = await supabase
+        .from('personal_bests')
+        .insert([{ user_id: userId }])
+        .select()
+      
+      console.log('Personal bests creation result:', { bestData, bestError })
+      if (bestError) throw bestError
+      
+      // 統計作成
+      const { data: statsData, error: statsError } = await supabase
+        .from('user_statistics')
+        .insert([{ user_id: userId }])
+        .select()
+      
+      console.log('Statistics creation result:', { statsData, statsError })
+      if (statsError) throw statsError
+      
+      // 設定作成
+      const { data: settingsData, error: settingsError } = await supabase
+        .from('user_settings')
+        .insert([{ user_id: userId }])
+        .select()
+      
+      console.log('Settings creation result:', { settingsData, settingsError })
+      if (settingsError) throw settingsError
+      
+      console.log('=== Manual Profile Creation Completed ===')
+    } catch (error) {
+      console.error('Manual profile creation failed:', error)
+      throw error
+    }
   }
 
   return (
