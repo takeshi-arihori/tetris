@@ -79,26 +79,41 @@ export default function DebugPage() {
     try {
       const supabase = createClient()
       
-      // 現在のユーザー状態を確認
+      // 現在のユーザー状態を確認（エラーがあっても続行）
       const { data: { user }, error: userError } = await supabase.auth.getUser()
       
+      let userInfo = `Current User: ${user ? JSON.stringify(user, null, 2) : 'No authenticated user'}`
       if (userError) {
-        setResult(`User Check Error: ${userError.message}`)
-        return
+        userInfo += `\nUser Error: ${userError.message}`
       }
       
-      // プロファイルを確認
+      // プロファイルを確認（認証なしでも実行）
       const { data: profiles, error: profileError } = await supabase
         .from('profiles')
         .select('*')
+        .order('created_at', { ascending: false })
         .limit(10)
       
       if (profileError) {
-        setResult(`Profile Check Error: ${profileError.message}`)
+        setResult(`${userInfo}\n\nProfile Check Error: ${profileError.message}\nCode: ${profileError.code}`)
         return
       }
       
-      setResult(`Current User: ${JSON.stringify(user, null, 2)}\n\nProfiles: ${JSON.stringify(profiles, null, 2)}`)
+      // 特定のユーザーのプロファイルを確認
+      const { data: specificProfile, error: specificError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', '7e425ea2-1301-4caa-be0d-d11a7109bc05')
+        .single()
+      
+      let specificInfo = ''
+      if (specificError) {
+        specificInfo = `\n\nSpecific Profile Error: ${specificError.message}`
+      } else {
+        specificInfo = `\n\nSpecific Profile: ${JSON.stringify(specificProfile, null, 2)}`
+      }
+      
+      setResult(`${userInfo}\n\nAll Profiles (${profiles.length}): ${JSON.stringify(profiles, null, 2)}${specificInfo}`)
     } catch (err) {
       setResult(`Check Users Exception: ${JSON.stringify(err, null, 2)}`)
     }
@@ -129,6 +144,47 @@ export default function DebugPage() {
     }
   }
 
+  const checkProfilesOnly = async () => {
+    try {
+      const supabase = createClient()
+      
+      // プロファイルのみを確認
+      const { data: profiles, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(10)
+      
+      if (profileError) {
+        setResult(`Profile Check Error: ${profileError.message}\nCode: ${profileError.code}`)
+        return
+      }
+      
+      // 各プロファイルに対応する統計情報も確認
+      const { data: stats } = await supabase
+        .from('user_statistics')
+        .select('*')
+        .order('updated_at', { ascending: false })
+        .limit(10)
+      
+      const { data: bests } = await supabase
+        .from('personal_bests')
+        .select('*')
+        .order('updated_at', { ascending: false })
+        .limit(10)
+      
+      const { data: settings } = await supabase
+        .from('user_settings')
+        .select('*')
+        .order('updated_at', { ascending: false })
+        .limit(10)
+      
+      setResult(`Total Profiles: ${profiles.length}\n\nAll Profiles: ${JSON.stringify(profiles, null, 2)}\n\nUser Statistics (${stats?.length || 0}): ${JSON.stringify(stats, null, 2)}\n\nPersonal Bests (${bests?.length || 0}): ${JSON.stringify(bests, null, 2)}\n\nUser Settings (${settings?.length || 0}): ${JSON.stringify(settings, null, 2)}`)
+    } catch (err) {
+      setResult(`Check Profiles Exception: ${JSON.stringify(err, null, 2)}`)
+    }
+  }
+
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-4">Supabase Debug</h1>
@@ -138,7 +194,7 @@ export default function DebugPage() {
         <p>Key: {process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.substring(0, 20)}...</p>
       </div>
       
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-3 gap-4 mb-4">
         <button 
           onClick={testConnection}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -165,6 +221,13 @@ export default function DebugPage() {
           className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
         >
           Check Current Users
+        </button>
+        
+        <button 
+          onClick={checkProfilesOnly}
+          className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+        >
+          Check Profiles Only
         </button>
         
         <button 
