@@ -49,14 +49,27 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
       })
 
       if (error) {
-        setError(error.message)
+        // より詳細なエラーハンドリング
+        console.error('Registration error:', error)
+        if (error.message.includes('already registered')) {
+          setError('このメールアドレスは既に登録されています。')
+        } else if (error.message.includes('weak password')) {
+          setError('パスワードが弱すぎます。より強力なパスワードを設定してください。')
+        } else if (error.message.includes('invalid email')) {
+          setError('メールアドレスの形式が正しくありません。')
+        } else if (error.message.includes('Database error')) {
+          setError('データベースエラーが発生しました。しばらく経ってから再度お試しください。')
+        } else {
+          setError(`登録エラー: ${error.message}`)
+        }
       } else {
         setMessage('登録が完了しました。確認メールをチェックしてください。')
         onSuccess?.()
         router.refresh()
       }
     } catch (err) {
-      setError('登録中にエラーが発生しました')
+      console.error('Registration catch error:', err)
+      setError('登録中にエラーが発生しました。しばらく経ってから再度お試しください。')
     } finally {
       setIsLoading(false)
     }
