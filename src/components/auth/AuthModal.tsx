@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import LoginForm from './LoginForm'
 import RegisterForm from './RegisterForm'
+import DevModePanel from './DevModePanel'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -43,6 +44,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             {mode === 'login' ? '新規登録はこちら' : 'ログインはこちら'}
           </button>
         </div>
+
+        <DevModePanel onSuccess={onClose} />
       </div>
     </div>
   )

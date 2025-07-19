@@ -176,8 +176,15 @@ CREATE TRIGGER update_user_settings_updated_at
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
+    -- Use username from metadata if available, otherwise use email with timestamp
     INSERT INTO profiles (id, username)
-    VALUES (NEW.id, NEW.email);
+    VALUES (
+        NEW.id, 
+        COALESCE(
+            NEW.raw_user_meta_data->>'username',
+            CONCAT(SPLIT_PART(NEW.email, '@', 1), '_', EXTRACT(EPOCH FROM NOW())::INTEGER)
+        )
+    );
     
     INSERT INTO personal_bests (user_id)
     VALUES (NEW.id);
@@ -189,6 +196,29 @@ BEGIN
     VALUES (NEW.id);
     
     RETURN NEW;
+EXCEPTION
+    WHEN unique_violation THEN
+        -- Handle unique constraint violation
+        INSERT INTO profiles (id, username)
+        VALUES (
+            NEW.id,
+            CONCAT(SPLIT_PART(NEW.email, '@', 1), '_', EXTRACT(EPOCH FROM NOW())::INTEGER, '_', SUBSTRING(NEW.id::TEXT, 1, 8))
+        );
+        
+        INSERT INTO personal_bests (user_id)
+        VALUES (NEW.id);
+        
+        INSERT INTO user_statistics (user_id)
+        VALUES (NEW.id);
+        
+        INSERT INTO user_settings (user_id)
+        VALUES (NEW.id);
+        
+        RETURN NEW;
+    WHEN OTHERS THEN
+        -- Log error but don't fail user creation
+        RAISE LOG 'Error in handle_new_user for user %: %', NEW.id, SQLERRM;
+        RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 

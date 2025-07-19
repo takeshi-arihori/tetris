@@ -33,7 +33,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
         onSuccess?.()
         router.refresh()
       }
-    } catch (err) {
+    } catch {
       setError('ログイン中にエラーが発生しました')
     } finally {
       setIsLoading(false)
