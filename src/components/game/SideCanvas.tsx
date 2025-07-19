@@ -7,7 +7,7 @@ import { SIDE_CANVAS_CONFIG } from '@/lib/canvas/utils';
 export interface SideCanvasHandle {
   getRenderer: () => CanvasRenderer | null;
   clear: () => void;
-  drawNextPiece: (tetromino: TetrominoData) => void;
+  renderNext: (tetromino: TetrominoData) => void;
 }
 
 interface SideCanvasProps {
@@ -32,7 +32,7 @@ export const SideCanvas = forwardRef<SideCanvasHandle, SideCanvasProps>(
         }
         
         return () => {
-          renderer.dispose();
+          renderer.stopPerformanceMonitoring();
           rendererRef.current = null;
         };
       } catch (error) {
@@ -47,9 +47,9 @@ export const SideCanvas = forwardRef<SideCanvasHandle, SideCanvasProps>(
           rendererRef.current.clear();
         }
       },
-      drawNextPiece: (tetromino: TetrominoData) => {
+      renderNext: (tetromino: TetrominoData) => {
         if (rendererRef.current) {
-          rendererRef.current.drawNextPiece(tetromino);
+          rendererRef.current.renderNext(tetromino);
         }
       },
     }));
