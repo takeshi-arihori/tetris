@@ -7,8 +7,12 @@ import { MAIN_CANVAS_CONFIG } from '@/lib/canvas/utils';
 export interface GameCanvasHandle {
   getRenderer: () => CanvasRenderer | null;
   clear: () => void;
-  drawBoard: (board: GameBoard, options?: RenderOptions) => void;
-  drawTetromino: (tetromino: TetrominoData, options?: RenderOptions) => void;
+  renderBoard: (board: GameBoard, options?: RenderOptions) => void;
+  renderTetromino: (tetromino: TetrominoData, options?: RenderOptions) => void;
+  renderGhost: (tetromino: TetrominoData, ghostPosition: { row: number; col: number }) => void;
+  renderLineClearAnimation: (lines: number[], progress: number, board: GameBoard) => void;
+  renderGameOverEffect: (progress: number) => void;
+  renderLevelUpEffect: (progress: number) => void;
 }
 
 interface GameCanvasProps {
@@ -33,7 +37,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(
         }
         
         return () => {
-          renderer.dispose();
+          renderer.stopPerformanceMonitoring();
           rendererRef.current = null;
         };
       } catch (error) {
@@ -48,14 +52,34 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(
           rendererRef.current.clear();
         }
       },
-      drawBoard: (board: GameBoard, options?: RenderOptions) => {
+      renderBoard: (board: GameBoard, options?: RenderOptions) => {
         if (rendererRef.current) {
-          rendererRef.current.drawBoard(board, options);
+          rendererRef.current.renderBoard(board, options);
         }
       },
-      drawTetromino: (tetromino: TetrominoData, options?: RenderOptions) => {
+      renderTetromino: (tetromino: TetrominoData, options?: RenderOptions) => {
         if (rendererRef.current) {
-          rendererRef.current.drawTetromino(tetromino, options);
+          rendererRef.current.renderTetromino(tetromino, options);
+        }
+      },
+      renderGhost: (tetromino: TetrominoData, ghostPosition: { row: number; col: number }) => {
+        if (rendererRef.current) {
+          rendererRef.current.renderGhost(tetromino, ghostPosition);
+        }
+      },
+      renderLineClearAnimation: (lines: number[], progress: number, board: GameBoard) => {
+        if (rendererRef.current) {
+          rendererRef.current.renderLineClearAnimation(lines, progress, board);
+        }
+      },
+      renderGameOverEffect: (progress: number) => {
+        if (rendererRef.current) {
+          rendererRef.current.renderGameOverEffect(progress);
+        }
+      },
+      renderLevelUpEffect: (progress: number) => {
+        if (rendererRef.current) {
+          rendererRef.current.renderLevelUpEffect(progress);
         }
       },
     }));
