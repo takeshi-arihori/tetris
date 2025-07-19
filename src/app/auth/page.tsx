@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import AuthModal from '@/components/auth/AuthModal'
 import UserProfile from '@/components/auth/UserProfile'
@@ -23,7 +24,24 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen bg-gray-100 py-8">
       <div className="max-w-2xl mx-auto px-4">
-        <h1 className="text-3xl font-bold text-center mb-8">認証システム</h1>
+        {/* ナビゲーション */}
+        <div className="flex items-center justify-between mb-8">
+          <Link 
+            href="/" 
+            className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
+          >
+            <span>←</span>
+            <span>トップページに戻る</span>
+          </Link>
+          <Link 
+            href="/audio-test" 
+            className="px-3 py-1 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition-colors"
+          >
+            🎵 音響テスト
+          </Link>
+        </div>
+
+        <h1 className="text-3xl font-bold text-center mb-8">🔐 認証システム</h1>
         
         {user ? (
           <UserProfile user={user} />

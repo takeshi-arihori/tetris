@@ -31,3 +31,50 @@ body {
     text-wrap: balance;
   }
 }
+
+/* 音量スライダーのスタイル */
+.slider {
+  background: linear-gradient(to right, #3b82f6 0%, #3b82f6 var(--value, 50%), #e5e7eb var(--value, 50%), #e5e7eb 100%);
+}
+
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.slider::-webkit-slider-thumb:hover {
+  background: #2563eb;
+  transform: scale(1.1);
+}
+
+.slider::-moz-range-thumb {
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.slider:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.slider:disabled::-webkit-slider-thumb {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.slider:disabled::-moz-range-thumb {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
