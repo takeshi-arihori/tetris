@@ -41,6 +41,20 @@ export default function Home() {
           </Link>
 
           <Link 
+            href="/canvas-demo" 
+            className="flex items-center justify-between p-3 bg-cyan-50 hover:bg-cyan-100 rounded-lg transition-colors group"
+          >
+            <div className="flex items-center space-x-3">
+              <span className="text-2xl">🎨</span>
+              <div>
+                <div className="font-medium text-gray-800">Canvas描画システム</div>
+                <div className="text-sm text-gray-600">アニメーション・エフェクト</div>
+              </div>
+            </div>
+            <span className="text-cyan-600 group-hover:text-cyan-700">→</span>
+          </Link>
+
+          <Link 
             href="/auth" 
             className="flex items-center justify-between p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors group"
           >
@@ -54,22 +68,25 @@ export default function Home() {
             <span className="text-blue-600 group-hover:text-blue-700">→</span>
           </Link>
 
+          <Link 
+            href="/history" 
+            className="flex items-center justify-between p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors group"
+          >
+            <div className="flex items-center space-x-3">
+              <span className="text-2xl">📊</span>
+              <div>
+                <div className="font-medium text-gray-800">スコア記録・履歴</div>
+                <div className="text-sm text-gray-600">統計・個人ベスト</div>
+              </div>
+            </div>
+            <span className="text-green-600 group-hover:text-green-700">→</span>
+          </Link>
+
           <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg opacity-50">
             <div className="flex items-center space-x-3">
               <span className="text-2xl">🎮</span>
               <div>
-                <div className="font-medium text-gray-800">ゲームエンジン</div>
-                <div className="text-sm text-gray-600">準備中...</div>
-              </div>
-            </div>
-            <span className="text-gray-400">🚧</span>
-          </div>
-
-          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg opacity-50">
-            <div className="flex items-center space-x-3">
-              <span className="text-2xl">🏆</span>
-              <div>
-                <div className="font-medium text-gray-800">ランキング</div>
+                <div className="font-medium text-gray-800">ゲームエンジン統合</div>
                 <div className="text-sm text-gray-600">準備中...</div>
               </div>
             </div>
@@ -81,7 +98,7 @@ export default function Home() {
       {/* プロジェクト情報 */}
       <div className="mt-12 text-center">
         <p className="text-sm text-gray-500 mb-2">
-          Phase 2: 音響システム統合 ✅ 完了
+          Phase 3: スコア記録・履歴機能 ✅ 完了
         </p>
         <div className="flex justify-center space-x-4 text-xs text-gray-400">
           <span>Next.js 15</span>
