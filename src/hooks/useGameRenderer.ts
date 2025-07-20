@@ -76,12 +76,12 @@ export function useGameRenderer(options: GameRendererOptions = {}) {
     renderer.clear();
     
     // Draw board
-    renderer.drawBoard(board, { showGrid, showShadow });
+    renderer.renderBoard(board, { showGrid, showShadow });
     
     // Draw current piece
     if (gameState.currentPiece) {
       const tetrominoData = convertTetrominoToData(gameState.currentPiece);
-      renderer.drawTetromino(tetrominoData, { showShadow });
+      renderer.renderTetromino(tetrominoData, { showShadow });
     }
     
     // Draw effects
@@ -94,7 +94,7 @@ export function useGameRenderer(options: GameRendererOptions = {}) {
     if (!sideRendererRef.current) return;
 
     const tetrominoData = convertTetrominoToData(nextPiece);
-    sideRendererRef.current.drawNextPiece(tetrominoData);
+    sideRendererRef.current.renderTetromino(tetrominoData);
   }, [convertTetrominoToData]);
 
   const handleGameStateChange = useCallback((gameState: GameState) => {
