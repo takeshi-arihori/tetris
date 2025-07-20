@@ -158,7 +158,8 @@ export function useAnimation() {
     onUpdate?: (progress: number, lines: number[]) => void,
     onComplete?: () => void
   ) => {
-    return createAnimation(key, {
+    const manager = getManager();
+    const animation = manager.createCustom(key, {
       duration,
       easing: EasingFunctions.easeInOutQuad,
       onUpdate: (progress) => {
@@ -167,15 +168,21 @@ export function useAnimation() {
         }
       },
       onComplete,
+    }, (progress) => {
+      if (onUpdate) {
+        onUpdate(progress, lines);
+      }
     });
-  }, [createAnimation]);
+    manager.start(key);
+    return animation;
+  }, [getManager]);
 
   const animateDrop = useCallback((
     key: string,
     from: number,
     to: number,
     duration: number,
-    onUpdate?: (y: number) => void,
+    onUpdate?: (progress: number, value: number) => void,
     onComplete?: () => void
   ) => {
     return animateNumber(key, {
@@ -191,7 +198,8 @@ export function useAnimation() {
   useEffect(() => {
     return () => {
       if (managerRef.current) {
-        managerRef.current.dispose();
+        managerRef.current.stopGlobalTimer();
+        managerRef.current.clear();
         managerRef.current = null;
       }
     };
