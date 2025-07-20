@@ -50,7 +50,7 @@ export function useGameRenderer(options: GameRendererOptions = {}) {
 
   const convertTetrominoToData = useCallback((tetromino: Tetromino): TetrominoData => {
     return {
-      shape: tetromino.shape,
+      shape: tetromino.shape.map(row => row.map(cell => Boolean(cell))),
       type: tetromino.type as TetrominoType,
       x: tetromino.position.x,
       y: tetromino.position.y,
@@ -59,16 +59,12 @@ export function useGameRenderer(options: GameRendererOptions = {}) {
   }, []);
 
   const convertBoardToGameBoard = useCallback((board: number[][]): GameBoard => {
-    return {
-      grid: board.map(row => row.map(cell => {
-        if (cell === 0) return null;
-        // Convert number to TetrominoType based on the mapping
-        const types: TetrominoType[] = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
-        return types[cell - 1] || null;
-      })),
-      rows: board.length,
-      cols: board[0]?.length || 0,
-    };
+    return board.map(row => row.map(cell => {
+      if (cell === 0) return 'EMPTY';
+      // Convert number to TetrominoType based on the mapping
+      const types: TetrominoType[] = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
+      return types[cell - 1] || 'EMPTY';
+    })) as GameBoard;
   }, []);
 
   const renderGame = useCallback((gameState: GameState) => {
