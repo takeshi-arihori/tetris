@@ -52,8 +52,7 @@ export function useGameRenderer(options: GameRendererOptions = {}) {
     return {
       shape: tetromino.shape.map(row => row.map(cell => Boolean(cell))),
       type: tetromino.type as TetrominoType,
-      x: tetromino.position.x,
-      y: tetromino.position.y,
+      position: { row: tetromino.position.y, col: tetromino.position.x },
       rotation: tetromino.rotation,
     };
   }, []);
