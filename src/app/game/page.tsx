@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, useCallback } from 'react'
 import { useTetris } from '@/hooks/useTetris'
 import { GameCanvas, GameCanvasHandle } from '@/components/game/GameCanvas'
 import GameLayout from '@/components/ui/GameLayout'
@@ -27,31 +27,25 @@ export default function GamePage() {
     }
   })
 
-  // Canvas と ゲームエンジンの統合（簡略化版）
-  useEffect(() => {
-    if (!renderer || !gameState) return
-
-    const animationFrame = requestAnimationFrame(() => {
-      renderer.clear()
-
-      // ボードを描画（基本的な表示のみ）
-      if (gameState.board) {
-        // 型の安全性のため、直接描画は避けて基本的な表示のみ
-        console.log('Rendering game state:', {
-          score: gameState.score,
-          level: gameState.level,
-          lines: gameState.lines,
-          isPlaying: gameState.isPlaying
-        })
-      }
-    })
-
-    return () => cancelAnimationFrame(animationFrame)
-  }, [renderer, gameState])
-
-  const handleCanvasMount = (canvasRenderer: CanvasRenderer) => {
+  // Canvas初期化のみ（レンダリングループは削除）
+  const handleCanvasMount = useCallback((canvasRenderer: CanvasRenderer) => {
     setRenderer(canvasRenderer)
-  }
+    console.log('Canvas mounted successfully')
+  }, [])
+
+  // ゲーム状態の基本ログ出力（開発用）
+  useEffect(() => {
+    if (gameState) {
+      console.log('Game state updated:', {
+        score: gameState.score,
+        level: gameState.level,
+        lines: gameState.lines,
+        isPlaying: gameState.isPlaying,
+        isPaused: gameState.isPaused,
+        isGameOver: gameState.isGameOver
+      })
+    }
+  }, [gameState?.score, gameState?.level, gameState?.lines, gameState?.isPlaying, gameState?.isPaused, gameState?.isGameOver])
 
   const sidebar = (
     <div className="space-y-6">
