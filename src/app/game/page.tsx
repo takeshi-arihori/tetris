@@ -24,19 +24,50 @@ export default function GamePage() {
     }
   })
 
-  // ゲーム状態の基本ログ出力（開発用）
+  // Canvas描画の統合
   useEffect(() => {
-    if (gameState) {
-      console.log('Game state updated:', {
-        score: gameState.score,
-        level: gameState.level,
-        lines: gameState.lines,
-        isPlaying: gameState.isPlaying,
-        isPaused: gameState.isPaused,
-        isGameOver: gameState.isGameOver
-      })
+    const canvas = canvasRef.current
+    if (!canvas || !gameState) return
+
+    const renderer = canvas.getRenderer()
+    if (!renderer) return
+
+    // Canvas をクリア
+    renderer.clear()
+
+    // ゲーム状態をコンソールに出力（デバッグ用）
+    console.log('Rendering game state:', {
+      isPlaying: gameState.isPlaying,
+      score: gameState.score,
+      level: gameState.level,
+      hasCurrentPiece: !!gameState.currentPiece,
+      boardSize: gameState.board?.length
+    })
+
+    // 簡単な描画テスト（基本的なゲーム情報表示）
+    try {
+      // ここで実際のCanvas描画を行う予定
+      // 現在は基本的なログ出力のみ
+    } catch (error) {
+      console.warn('Canvas rendering error:', error)
     }
-  }, [gameState?.score, gameState?.level, gameState?.lines, gameState?.isPlaying, gameState?.isPaused, gameState?.isGameOver])
+  }, [gameState])
+
+  // ゲーム開始の確認
+  const handleStartGame = () => {
+    console.log('Starting game...')
+    startGame()
+  }
+
+  const handlePauseGame = () => {
+    console.log('Pausing/Resuming game...')
+    pauseGame()
+  }
+
+  const handleRestartGame = () => {
+    console.log('Restarting game...')
+    restartGame()
+  }
 
   const sidebar = (
     <div className="space-y-6">
@@ -44,9 +75,9 @@ export default function GamePage() {
       <GameControls
         isPlaying={gameState?.isPlaying || false}
         isPaused={gameState?.isPaused || false}
-        onStart={startGame}
-        onPause={pauseGame}
-        onRestart={restartGame}
+        onStart={handleStartGame}
+        onPause={handlePauseGame}
+        onRestart={handleRestartGame}
       />
 
       {/* スコア表示 */}
@@ -129,7 +160,7 @@ export default function GamePage() {
 
         {/* ゲーム状態表示 */}
         {gameState && (
-          <div className="mt-4 text-center">
+          <div className="mt-4 text-center space-y-2">
             {gameState.isGameOver && (
               <div className="bg-red-500/80 text-white px-4 py-2 rounded-lg font-bold">
                 ゲームオーバー！ スコア: {gameState.score}
@@ -145,6 +176,19 @@ export default function GamePage() {
                 ゲーム開始を押してプレイ！
               </div>
             )}
+            {gameState.isPlaying && !gameState.isPaused && !gameState.isGameOver && (
+              <div className="bg-green-500/80 text-white px-4 py-2 rounded-lg font-bold">
+                ゲーム実行中 🎮
+              </div>
+            )}
+            
+            {/* デバッグ情報 */}
+            <div className="bg-gray-800/80 text-gray-300 px-3 py-2 rounded text-xs">
+              Debug: Playing={gameState.isPlaying ? 'YES' : 'NO'} | 
+              Paused={gameState.isPaused ? 'YES' : 'NO'} | 
+              GameOver={gameState.isGameOver ? 'YES' : 'NO'} | 
+              HasPiece={gameState.currentPiece ? 'YES' : 'NO'}
+            </div>
           </div>
         )}
       </div>
