@@ -55,7 +55,7 @@ jobs:
         PLAYWRIGHT_BASE_URL: http://localhost:3000
         
     - name: Upload E2E test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: playwright-report-${{ matrix.node-version }}
@@ -111,7 +111,7 @@ jobs:
         NODE_ENV: production
         
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: build-files
         path: .next/
@@ -232,9 +232,10 @@ jobs:
     steps:
     - name: Notify deployment status
       uses: 8398a7/action-slack@v3
-      if: always()
+      if: always() && secrets.SLACK_WEBHOOK != ''
       with:
         status: ${{ job.status }}
         channel: '#deployments'
-        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
         fields: repo,message,commit,author,action,eventName,ref,workflow
