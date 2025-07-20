@@ -94,8 +94,10 @@ class GameOptimizer {
       // 画像のスムージングを無効化（ピクセルアート用）
       ctx.imageSmoothingEnabled = false
       
-      // 描画品質設定
-      ctx.textRenderingOptimization = 'speed'
+      // 描画品質設定 (ブラウザサポート確認)
+      if ('textRenderingOptimization' in ctx) {
+        (ctx as any).textRenderingOptimization = 'speed'
+      }
     }
 
     return ctx
