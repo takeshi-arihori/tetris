@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris - Title Screen</title>
+
+    <!-- Tailwind CSSの読み込み -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fontsからモダンなフォントを読み込み -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+JP&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* カスタムスタイル */
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #0D1117;
+            /* GitHubのダークモード風の背景色 */
+            color: #c9d1d9;
+            overflow: hidden;
+            /* 背景アニメーションがはみ出ないように */
+        }
+
+        /* 背景のグリッド線 */
+        .main-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: 0;
+        }
+
+        /* 背景アニメーション用キャンバス */
+        #background-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* コンテンツはアニメーションより手前に表示 */
+        .content-wrapper {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* タイトルやスコア表示に使うフォント */
+        .font-display {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* ネオン風のテキストエフェクト */
+        .neon-text-cyan {
+            color: #99f6e4;
+            font-weight: 900;
+            text-shadow:
+                0 0 7px #06b6d4,
+                0 0 10px #06b6d4,
+                0 0 21px #06b6d4,
+                0 0 42px #0891b2,
+                0 0 82px #0891b2;
+        }
+
+        /* ボタンのスタイル */
+        .menu-button {
+            background: rgba(1, 22, 39, 0.5);
+            border: 1px solid rgba(0, 199, 255, 0.3);
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .menu-button:hover {
+            background: rgba(1, 22, 39, 0.8);
+            color: #f0f9ff;
+            border-color: #06b6d4;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.6);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-container relative w-full h-screen">
+        <!-- 背景アニメーション用キャンバス -->
+        <canvas id="background-canvas"></canvas>
+
+        <!-- コンテンツ -->
+        <div class="content-wrapper w-full h-full flex flex-col justify-center items-center text-center p-4">
+
+            <!-- タイトル -->
+            <h1 class="font-display text-7xl md:text-9xl neon-text-cyan tracking-widest mb-12 animate-pulse"
+                style="animation-duration: 4s;">
+                TETRIS
+            </h1>
+
+            <!-- メニュー -->
+            <div class="space-y-6">
+                <!-- STARTボタン -->
+                <button
+                    class="menu-button font-display text-2xl md:text-3xl text-cyan-200 py-3 px-12 rounded-lg tracking-widest w-64">
+                    START GAME
+                </button>
+
+                <!-- オプションボタン（仮） -->
+                <button
+                    class="menu-button font-display text-xl text-cyan-400 py-2 px-10 rounded-lg tracking-wider w-64">
+                    OPTIONS
+                </button>
+            </div>
+
+            <!-- フッター -->
+            <footer class="absolute bottom-5 text-gray-500 text-sm">
+                &copy; 2025 Your Name. A modern take on a classic.
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // 背景のパーティクルアニメーション
+        const canvas = document.getElementById('background-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particlesArray;
+
+        // パーティクルクラス
+        class Particle {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.directionX = directionX;
+                this.directionY = directionY;
+                this.size = size;
+                this.color = color;
+            }
+            // 描画
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+            // 更新
+            update() {
+                if (this.x > canvas.width || this.x < 0) {
+                    this.directionX = -this.directionX;
+                }
+                if (this.y > canvas.height || this.y < 0) {
+                    this.directionY = -this.directionY;
+                }
+
+                this.x += this.directionX;
+                this.y += this.directionY;
+                this.draw();
+            }
+        }
+
+        // パーティクルの初期化
+        function init() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 9000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 2) + 1;
+                let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                let directionX = (Math.random() * .4) - .2;
+                let directionY = (Math.random() * .4) - .2;
+                let color = 'rgba(0, 199, 255, 0.3)';
+
+                particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+            }
+        }
+
+        // アニメーションループ
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, innerWidth, innerHeight);
+
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+            }
+        }
+
+        // ウィンドウリサイズ時の処理
+        window.addEventListener('resize', () => {
+            canvas.width = innerWidth;
+            canvas.height = innerHeight;
+            init();
+        });
+
+        // 実行
+        init();
+        animate();
+    </script>
+
+</body>
+
+</html>
