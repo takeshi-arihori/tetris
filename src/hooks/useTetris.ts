@@ -15,6 +15,15 @@ export function useTetris({ config, onGameOver, onLinesCleared }: UseTetrisProps
   const [gameState, setGameState] = useState<GameState | null>(null)
   const engineRef = useRef<TetrisGameEngine | null>(null)
   
+  // Memoize callbacks to prevent unnecessary re-renders
+  const memoizedOnGameOver = useCallback((state: GameState) => {
+    onGameOver?.(state)
+  }, [onGameOver])
+  
+  const memoizedOnLinesCleared = useCallback((lines: number, state: GameState) => {
+    onLinesCleared?.(lines, state)
+  }, [onLinesCleared])
+  
   // Initialize game engine
   useEffect(() => {
     const engine = new TetrisGameEngine(config)
@@ -26,11 +35,11 @@ export function useTetris({ config, onGameOver, onLinesCleared }: UseTetrisProps
       },
       onGameOver: (state) => {
         setGameState(state)
-        onGameOver?.(state)
+        memoizedOnGameOver(state)
       },
       onLinesCleared: (lines, state) => {
         setGameState(state)
-        onLinesCleared?.(lines, state)
+        memoizedOnLinesCleared(lines, state)
       },
     })
     
@@ -39,7 +48,7 @@ export function useTetris({ config, onGameOver, onLinesCleared }: UseTetrisProps
     return () => {
       engine.destroy()
     }
-  }, [config, onGameOver, onLinesCleared])
+  }, [config, memoizedOnGameOver, memoizedOnLinesCleared])
   
   const handleAction = useCallback((action: GameAction) => {
     if (!engineRef.current) return

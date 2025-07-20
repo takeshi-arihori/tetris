@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useGameRecord } from '@/hooks/useGameRecord';
 import { useStatistics } from '@/hooks/useStatistics';
-import type { CreateGameRecordData, GameResult as GameResultType } from '@/types/game-records';
+import type { CreateGameRecordData } from '@/types/game-records';
 
 interface GameResultProps {
   gameData: CreateGameRecordData;

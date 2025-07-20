@@ -5,7 +5,8 @@ import { CanvasRenderer, GameBoard, TetrominoData } from '@/lib/canvas/renderer'
 import { EffectsManager, createGameOverEffect, createLevelUpEffect, createTetrisEffect } from '@/lib/canvas/effects';
 import { useAnimation } from './useAnimation';
 import { GameState, Tetromino } from '@/types/tetris';
-import { TETROMINO_COLORS, TetrominoType } from '@/lib/canvas/colors';
+import { TetrominoType } from '@/lib/canvas/colors';
+import { TetrominoFactory } from '@/lib/tetris/tetromino';
 
 export interface GameRendererOptions {
   showGrid?: boolean;
@@ -29,7 +30,6 @@ export function useGameRenderer(options: GameRendererOptions = {}) {
     animateDrop,
     animateRotation,
     animateLineClear,
-    stopAnimation,
     stopAllAnimations,
   } = useAnimation();
 
@@ -109,7 +109,7 @@ export function useGameRenderer(options: GameRendererOptions = {}) {
 
     // Check for lines cleared
     if (gameState.lines > prevLinesRef.current) {
-      const clearedLines = gameState.lines - prevLinesRef.current;
+      // Lines cleared for potential effects
       if (showEffects && effectsManagerRef.current && mainRendererRef.current) {
         const canvas = mainRendererRef.current['ctx'].canvas;
         // Simulate line positions for effect (this would need to be passed from game engine)
@@ -128,13 +128,8 @@ export function useGameRenderer(options: GameRendererOptions = {}) {
     // Render the game
     renderGame(gameState);
     if (gameState.nextPiece) {
-      // Convert TetrominoType to Tetromino for rendering
-      const nextPieceData: Tetromino = {
-        type: gameState.nextPiece,
-        shape: [[1]], // Simplified - would need proper shape lookup
-        position: { x: 0, y: 0 },
-        rotation: 0,
-      };
+      // Create proper tetromino instance for the next piece
+      const nextPieceData = TetrominoFactory.createTetromino(gameState.nextPiece, { x: 0, y: 0 });
       renderNextPiece(nextPieceData);
     }
   }, [showEffects, renderGame, renderNextPiece, getEffectsManager]);
@@ -156,7 +151,7 @@ export function useGameRenderer(options: GameRendererOptions = {}) {
       fromY,
       toY,
       duration,
-      (_y) => {
+      () => {
         if (mainRendererRef.current) {
           // Re-render with animated position
           // This would need integration with the game state
@@ -164,7 +159,7 @@ export function useGameRenderer(options: GameRendererOptions = {}) {
       },
       onComplete
     );
-  }, [animationEnabled, animateDrop, convertTetrominoToData]);
+  }, [animationEnabled, animateDrop]);
 
   const animateTetrominoRotation = useCallback((
     tetromino: Tetromino,
@@ -183,7 +178,7 @@ export function useGameRenderer(options: GameRendererOptions = {}) {
       fromRotation,
       toRotation,
       duration,
-      (_rotation) => {
+      () => {
         if (mainRendererRef.current) {
           // Re-render with animated rotation
           // This would need integration with the game state
@@ -191,7 +186,7 @@ export function useGameRenderer(options: GameRendererOptions = {}) {
       },
       onComplete
     );
-  }, [animationEnabled, animateRotation, convertTetrominoToData]);
+  }, [animationEnabled, animateRotation]);
 
   const animateLinesClear = useCallback((
     lines: number[],
@@ -207,7 +202,7 @@ export function useGameRenderer(options: GameRendererOptions = {}) {
       'lines-clear',
       lines,
       duration,
-      (_progress, _clearedLines) => {
+      () => {
         // Apply line clear animation effects
         if (mainRendererRef.current) {
           // This would need custom rendering logic for line clearing animation

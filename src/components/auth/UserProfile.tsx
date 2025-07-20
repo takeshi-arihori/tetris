@@ -41,7 +41,7 @@ export default function UserProfile({ user }: UserProfileProps) {
         setProfile(data)
         setUsername(data.username || '')
       }
-    } catch (err) {
+    } catch {
       setError('プロフィールの取得に失敗しました')
     } finally {
       setIsLoading(false)
@@ -62,7 +62,7 @@ export default function UserProfile({ user }: UserProfileProps) {
         setIsEditing(false)
         fetchProfile()
       }
-    } catch (err) {
+    } catch {
       setError('プロフィールの更新に失敗しました')
     }
   }
@@ -72,7 +72,7 @@ export default function UserProfile({ user }: UserProfileProps) {
       const supabase = createClient()
       await supabase.auth.signOut()
       window.location.reload()
-    } catch (err) {
+    } catch {
       setError('ログアウトに失敗しました')
     }
   }

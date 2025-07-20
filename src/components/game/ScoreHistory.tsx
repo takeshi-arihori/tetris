@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useGameRecord } from '@/hooks/useGameRecord';
 import type { GameRecord, GameRecordFilters, GameRecordSort, GameMode } from '@/types/game-records';
 

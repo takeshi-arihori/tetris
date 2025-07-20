@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useCallback } from 'react';
 import { GameCanvas, GameCanvasHandle } from './GameCanvas';
 import { SideCanvas, SideCanvasHandle } from './SideCanvas';
 import { useGameRenderer } from '@/hooks/useGameRenderer';
+import { CanvasRenderer } from '@/lib/canvas/renderer';
 import { GameState } from '@/types/tetris';
 import { TetrisGameEngine } from '@/lib/tetris/gameEngine';
 
@@ -41,11 +42,11 @@ export const CanvasGameRenderer: React.FC<CanvasGameRendererProps> = ({
     animationEnabled,
   });
 
-  const onGameCanvasMount = useCallback((renderer: any) => {
+  const onGameCanvasMount = useCallback((renderer: CanvasRenderer) => {
     setMainRenderer(renderer);
   }, [setMainRenderer]);
 
-  const onSideCanvasMount = useCallback((renderer: any) => {
+  const onSideCanvasMount = useCallback((renderer: CanvasRenderer) => {
     setSideRenderer(renderer);
   }, [setSideRenderer]);
 

@@ -42,7 +42,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
       // Debug: Registration process started
       
       // まずユーザー名の重複チェック
-      const { data: existingUser, error: checkError } = await supabase
+      const { data: existingUser } = await supabase
         .from('profiles')
         .select('username')
         .eq('username', username)

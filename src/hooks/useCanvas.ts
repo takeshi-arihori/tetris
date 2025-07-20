@@ -26,7 +26,7 @@ export interface CanvasHookReturn {
   renderTetromino: (tetromino: TetrominoData, options?: RenderOptions) => void;
   renderGhost: (tetromino: TetrominoData, ghostPosition: { row: number; col: number }) => void;
   renderNext: (tetromino: TetrominoData) => void;
-  renderText: (text: string, x: number, y: number, options?: any) => void;
+  renderText: (text: string, x: number, y: number, options?: { color?: string; fontSize?: number; fontFamily?: string; align?: CanvasTextAlign }) => void;
   startLineClearAnimation: (lines: number[], board: GameBoard, onComplete?: () => void) => void;
   startLevelUpAnimation: (onComplete?: () => void) => void;
   startGameOverAnimation: (onComplete?: () => void) => void;
@@ -166,7 +166,7 @@ export function useCanvas(options: UseCanvasOptions = {}): CanvasHookReturn {
     }
   }, []);
 
-  const renderText = useCallback((text: string, x: number, y: number, options?: any) => {
+  const renderText = useCallback((text: string, x: number, y: number, options?: { color?: string; fontSize?: number; fontFamily?: string; align?: CanvasTextAlign }) => {
     if (rendererRef.current) {
       rendererRef.current.renderText(text, x, y, options);
     }

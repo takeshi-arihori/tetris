@@ -29,7 +29,14 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(
       if (!canvasRef.current) return;
 
       try {
-        const renderer = new CanvasRenderer(canvasRef.current, MAIN_CANVAS_CONFIG);
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
+        
+        if (!context) {
+          throw new Error('Canvas 2D context not supported');
+        }
+
+        const renderer = new CanvasRenderer(canvas, MAIN_CANVAS_CONFIG);
         rendererRef.current = renderer;
         
         if (onMount) {
@@ -41,7 +48,11 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(
           rendererRef.current = null;
         };
       } catch (error) {
-        console.error('Failed to initialize GameCanvas:', error);
+        // Canvas initialization failed - fallback to null renderer
+        rendererRef.current = null;
+        if (error instanceof Error) {
+          // Could implement user-friendly error notification here
+        }
       }
     }, [onMount]);
 

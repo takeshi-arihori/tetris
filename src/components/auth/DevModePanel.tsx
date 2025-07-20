@@ -1,14 +1,11 @@
 'use client'
 
-import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
 
 interface DevModePanelProps {
   onSuccess?: () => void
 }
 
-export default function DevModePanel({ onSuccess }: DevModePanelProps) {
+export default function DevModePanel({}: DevModePanelProps) {
   const isDev = process.env.NEXT_PUBLIC_APP_ENV === 'development'
 
   if (!isDev) {
