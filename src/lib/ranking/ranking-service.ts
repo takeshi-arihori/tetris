@@ -42,8 +42,8 @@ export class RankingService {
         score: record.score,
         level: record.level,
         rankPosition: record.rank_position,
-        periodStart: record.period_start,
-        periodEnd: record.period_end
+        periodStart: record.period_start || undefined,
+        periodEnd: record.period_end || undefined
       }))
     } catch (error) {
       console.error(`ランキング取得エラー (${rankType}):`, error)
@@ -115,8 +115,8 @@ export class RankingService {
         score: record.score,
         level: record.level,
         rankPosition: record.rank_position,
-        periodStart: record.period_start,
-        periodEnd: record.period_end
+        periodStart: record.period_start || undefined,
+        periodEnd: record.period_end || undefined
       }))
     } catch (error) {
       console.error('周辺順位取得エラー:', error)
