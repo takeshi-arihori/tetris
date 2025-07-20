@@ -166,7 +166,7 @@ export class RankingService {
     // 新しいランキングデータを挿入
     const rankingData: RankingInsert[] = topScores.map((record, index) => ({
       user_id: record.user_id,
-      username: record.profiles.username,
+      username: (record as any).profiles?.username || 'Unknown',
       score: record.best_score,
       level: 1, // TODO: レベル情報を取得
       rank_type: 'overall',
@@ -228,7 +228,7 @@ export class RankingService {
       .sort((a, b) => b.score - a.score)
       .map((record, index) => ({
         user_id: record.user_id,
-        username: record.profiles.username,
+        username: (record as any).profiles?.username || 'Unknown',
         score: record.score,
         level: record.level,
         rank_type: 'weekly',
@@ -286,7 +286,7 @@ export class RankingService {
       .sort((a, b) => b.score - a.score)
       .map((record, index) => ({
         user_id: record.user_id,
-        username: record.profiles.username,
+        username: (record as any).profiles?.username || 'Unknown',
         score: record.score,
         level: record.level,
         rank_type: 'monthly',
@@ -344,7 +344,7 @@ export class RankingService {
       .sort((a, b) => b.score - a.score)
       .map((record, index) => ({
         user_id: record.user_id,
-        username: record.profiles.username,
+        username: (record as any).profiles?.username || 'Unknown',
         score: record.score,
         level: record.level,
         rank_type: 'yearly',
