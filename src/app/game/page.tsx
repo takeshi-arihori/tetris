@@ -1,17 +1,14 @@
 'use client'
 
-import React, { useRef, useEffect, useState, useCallback } from 'react'
+import React, { useRef, useEffect } from 'react'
 import { useTetris } from '@/hooks/useTetris'
 import { GameCanvas, GameCanvasHandle } from '@/components/game/GameCanvas'
 import GameLayout from '@/components/ui/GameLayout'
 import GameControls from '@/components/ui/GameControls'
 import ScoreDisplay from '@/components/ui/ScoreDisplay'
-import { CanvasRenderer } from '@/lib/canvas/renderer'
-import { initializeAudio } from '@/lib/audio'
 
 export default function GamePage() {
   const canvasRef = useRef<GameCanvasHandle>(null)
-  const [renderer, setRenderer] = useState<CanvasRenderer | null>(null)
 
   const {
     gameState,
@@ -26,12 +23,6 @@ export default function GamePage() {
       console.log(`Lines cleared: ${lines}`)
     }
   })
-
-  // Canvas初期化のみ（レンダリングループは削除）
-  const handleCanvasMount = useCallback((canvasRenderer: CanvasRenderer) => {
-    setRenderer(canvasRenderer)
-    console.log('Canvas mounted successfully')
-  }, [])
 
   // ゲーム状態の基本ログ出力（開発用）
   useEffect(() => {
@@ -133,7 +124,6 @@ export default function GamePage() {
         {/* ゲームキャンバス */}
         <GameCanvas
           ref={canvasRef}
-          onMount={handleCanvasMount}
           className="rounded-lg shadow-2xl"
         />
 

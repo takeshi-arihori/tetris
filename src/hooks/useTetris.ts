@@ -48,7 +48,8 @@ export function useTetris({ config, onGameOver, onLinesCleared }: UseTetrisProps
     return () => {
       engine.destroy()
     }
-  }, [config, memoizedOnGameOver, memoizedOnLinesCleared])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config])
   
   const handleAction = useCallback((action: GameAction) => {
     if (!engineRef.current) return
