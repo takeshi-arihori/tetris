@@ -6,7 +6,7 @@ const nextConfig = {
   
   // 実験的機能
   experimental: {
-    optimizeCss: true,
+    // optimizeCss: true, // critterモジュール依存のため無効化
     optimizePackageImports: ['lucide-react', '@supabase/supabase-js'],
   },
 
