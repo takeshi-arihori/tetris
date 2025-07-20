@@ -114,7 +114,7 @@ export function useGameRenderer(options: GameRendererOptions = {}) {
         const canvas = mainRendererRef.current['ctx'].canvas;
         // Simulate line positions for effect (this would need to be passed from game engine)
         const linePositions = Array.from({ length: clearedLines }, (_, i) => i);
-        createTetrisEffect(getEffectsManager(), linePositions, canvas.width, 30);
+        createTetrisEffect(getEffectsManager(), linePositions, canvas.width);
       }
       prevLinesRef.current = gameState.lines;
     }
