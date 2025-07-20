@@ -9,7 +9,7 @@ HTML・CSS・JavaScriptを使ってテトリスを作成しました。
 
 #### プレイはこちらから
 
-[Tetris](https://tetris20230212.firebaseapp.com/)
+[Tetris](https://tetris-git-main-takeshiarihoris-projects.vercel.app/)
   
 <img width="700" height="500" alt="テトリスオープニング画像" src="https://user-images.githubusercontent.com/83809409/219990097-b3df0faf-8a8b-4d28-8b2a-507b33f17d0d.png">   
   
