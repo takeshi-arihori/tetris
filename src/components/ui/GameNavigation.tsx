@@ -16,9 +16,9 @@ interface GameNavigationProps {
 
 const navigationItems: NavigationItem[] = [
   { name: 'ゲーム', href: '/' },
-  { name: 'ランキング', href: '/rankings' },
+  { name: 'ランキング', href: '/ranking' },
   { name: 'プロフィール', href: '/profile' },
-  { name: '設定', href: '/settings' },
+  { name: '設定', href: '/profile/settings' },
 ]
 
 export default function GameNavigation({ className = '' }: GameNavigationProps) {
