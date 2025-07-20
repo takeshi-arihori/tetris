@@ -29,11 +29,14 @@ export default function GameHeader({ title = 'Tetris', showAuth = true, classNam
             <Link href="/" className="text-gray-300 hover:text-white transition-colors">
               ゲーム
             </Link>
-            <Link href="/rankings" className="text-gray-300 hover:text-white transition-colors">
+            <Link href="/ranking" className="text-gray-300 hover:text-white transition-colors">
               ランキング
             </Link>
             <Link href="/profile" className="text-gray-300 hover:text-white transition-colors">
               プロフィール
+            </Link>
+            <Link href="/profile/settings" className="text-gray-300 hover:text-white transition-colors">
+              設定
             </Link>
           </nav>
 

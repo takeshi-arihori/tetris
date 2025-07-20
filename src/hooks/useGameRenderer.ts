@@ -50,25 +50,20 @@ export function useGameRenderer(options: GameRendererOptions = {}) {
 
   const convertTetrominoToData = useCallback((tetromino: Tetromino): TetrominoData => {
     return {
-      shape: tetromino.shape,
+      shape: tetromino.shape.map(row => row.map(cell => Boolean(cell))),
       type: tetromino.type as TetrominoType,
-      x: tetromino.position.x,
-      y: tetromino.position.y,
+      position: { row: tetromino.position.y, col: tetromino.position.x },
       rotation: tetromino.rotation,
     };
   }, []);
 
   const convertBoardToGameBoard = useCallback((board: number[][]): GameBoard => {
-    return {
-      grid: board.map(row => row.map(cell => {
-        if (cell === 0) return null;
-        // Convert number to TetrominoType based on the mapping
-        const types: TetrominoType[] = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
-        return types[cell - 1] || null;
-      })),
-      rows: board.length,
-      cols: board[0]?.length || 0,
-    };
+    return board.map(row => row.map(cell => {
+      if (cell === 0) return 'EMPTY';
+      // Convert number to TetrominoType based on the mapping
+      const types: TetrominoType[] = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
+      return types[cell - 1] || 'EMPTY';
+    })) as GameBoard;
   }, []);
 
   const renderGame = useCallback((gameState: GameState) => {
@@ -81,12 +76,12 @@ export function useGameRenderer(options: GameRendererOptions = {}) {
     renderer.clear();
     
     // Draw board
-    renderer.drawBoard(board, { showGrid, showShadow });
+    renderer.renderBoard(board, { showGrid, showShadow });
     
     // Draw current piece
     if (gameState.currentPiece) {
       const tetrominoData = convertTetrominoToData(gameState.currentPiece);
-      renderer.drawTetromino(tetrominoData, { showShadow });
+      renderer.renderTetromino(tetrominoData, { showShadow });
     }
     
     // Draw effects
@@ -99,7 +94,7 @@ export function useGameRenderer(options: GameRendererOptions = {}) {
     if (!sideRendererRef.current) return;
 
     const tetrominoData = convertTetrominoToData(nextPiece);
-    sideRendererRef.current.drawNextPiece(tetrominoData);
+    sideRendererRef.current.renderTetromino(tetrominoData);
   }, [convertTetrominoToData]);
 
   const handleGameStateChange = useCallback((gameState: GameState) => {
@@ -118,8 +113,8 @@ export function useGameRenderer(options: GameRendererOptions = {}) {
       if (showEffects && effectsManagerRef.current && mainRendererRef.current) {
         const canvas = mainRendererRef.current['ctx'].canvas;
         // Simulate line positions for effect (this would need to be passed from game engine)
-        const linePositions = Array.from({ length: clearedLines }, (_, i) => i);
-        createTetrisEffect(getEffectsManager(), linePositions, canvas.width, 30);
+        const linePosition = Math.floor(canvas.height / 2); // 仮の位置
+        createTetrisEffect(getEffectsManager(), linePosition, canvas.width);
       }
       prevLinesRef.current = gameState.lines;
     }

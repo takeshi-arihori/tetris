@@ -20,9 +20,9 @@ export function useAnimation() {
     return managerRef.current;
   }, []);
 
-  const createAnimation = useCallback((key: string, config: AnimationConfig) => {
+  const createAnimation = useCallback((key: string, config: TweenConfig) => {
     const manager = getManager();
-    return manager.create(key, config);
+    return manager.createTween(key, config);
   }, [getManager]);
 
   const startAnimation = useCallback((key: string) => {
@@ -50,41 +50,31 @@ export function useAnimation() {
     manager.clear();
   }, [getManager]);
 
+  useEffect(() => {
+    return () => {
+      const manager = managerRef.current;
+      if (manager) {
+        manager.stopGlobalTimer();
+        manager.clear();
+      }
+    };
+  }, []);
+
   const hasAnimation = useCallback((key: string) => {
     const manager = getManager();
-    return manager.has(key);
+    return manager.get(key) !== undefined;
   }, [getManager]);
 
-  const animateNumber = useCallback((key: string, config: TweenConfig<number>) => {
+  const animateNumber = useCallback((key: string, config: TweenConfig) => {
     const manager = getManager();
-    const animation = createNumberTween(config);
-    manager.create(key, {
-      duration: config.duration,
-      easing: config.easing || EasingFunctions.linear,
-      onUpdate: config.onUpdate ? (progress) => {
-        const value = config.from + (config.to - config.from) * progress;
-        config.onUpdate!(value);
-      } : undefined,
-      onComplete: config.onComplete,
-    });
+    const animation = manager.createTween(key, config);
     manager.start(key);
     return animation;
   }, [getManager]);
 
-  const animateColor = useCallback((key: string, config: TweenConfig<string>) => {
+  const animateColor = useCallback((key: string, fromColor: string, toColor: string, config: AnimationConfig) => {
     const manager = getManager();
-    const animation = createColorTween(config);
-    manager.create(key, {
-      duration: config.duration,
-      easing: config.easing || EasingFunctions.linear,
-      onUpdate: config.onUpdate ? (_progress) => {
-        // Color interpolation logic would go here
-        if (config.onUpdate) {
-          config.onUpdate(config.from); // Simplified for now
-        }
-      } : undefined,
-      onComplete: config.onComplete,
-    });
+    const animation = manager.createColorTween(key, fromColor, toColor, config);
     manager.start(key);
     return animation;
   }, [getManager]);
@@ -94,7 +84,7 @@ export function useAnimation() {
     from: number, 
     to: number, 
     duration: number, 
-    onUpdate?: (alpha: number) => void, 
+    onUpdate?: (progress: number, value: number) => void, 
     onComplete?: () => void
   ) => {
     return animateNumber(key, {
@@ -112,7 +102,7 @@ export function useAnimation() {
     from: number, 
     to: number, 
     duration: number, 
-    onUpdate?: (position: number) => void, 
+    onUpdate?: (progress: number, value: number) => void, 
     onComplete?: () => void
   ) => {
     return animateNumber(key, {
@@ -130,14 +120,14 @@ export function useAnimation() {
     from: number, 
     to: number, 
     duration: number, 
-    onUpdate?: (scale: number) => void, 
+    onUpdate?: (progress: number, value: number) => void, 
     onComplete?: () => void
   ) => {
     return animateNumber(key, {
       from,
       to,
       duration,
-      easing: EasingFunctions.easeOutElastic,
+      easing: EasingFunctions.easeOutBack,
       onUpdate,
       onComplete,
     });
@@ -148,7 +138,7 @@ export function useAnimation() {
     from: number, 
     to: number, 
     duration: number, 
-    onUpdate?: (rotation: number) => void, 
+    onUpdate?: (progress: number, value: number) => void, 
     onComplete?: () => void
   ) => {
     return animateNumber(key, {
@@ -168,7 +158,8 @@ export function useAnimation() {
     onUpdate?: (progress: number, lines: number[]) => void,
     onComplete?: () => void
   ) => {
-    return createAnimation(key, {
+    const manager = getManager();
+    const animation = manager.createCustom(key, {
       duration,
       easing: EasingFunctions.easeInOutQuad,
       onUpdate: (progress) => {
@@ -177,15 +168,21 @@ export function useAnimation() {
         }
       },
       onComplete,
+    }, (progress) => {
+      if (onUpdate) {
+        onUpdate(progress, lines);
+      }
     });
-  }, [createAnimation]);
+    manager.start(key);
+    return animation;
+  }, [getManager]);
 
   const animateDrop = useCallback((
     key: string,
     from: number,
     to: number,
     duration: number,
-    onUpdate?: (y: number) => void,
+    onUpdate?: (progress: number, value: number) => void,
     onComplete?: () => void
   ) => {
     return animateNumber(key, {
@@ -201,7 +198,8 @@ export function useAnimation() {
   useEffect(() => {
     return () => {
       if (managerRef.current) {
-        managerRef.current.dispose();
+        managerRef.current.stopGlobalTimer();
+        managerRef.current.clear();
         managerRef.current = null;
       }
     };

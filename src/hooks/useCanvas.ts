@@ -253,7 +253,7 @@ export function useCanvas(options: UseCanvasOptions = {}): CanvasHookReturn {
   }, []);
 
   return {
-    canvasRef,
+    canvasRef: canvasRef as React.RefObject<HTMLCanvasElement>,
     renderer: rendererRef.current,
     animationManager: animationManagerRef.current,
     effectsManager: effectsManagerRef.current,
