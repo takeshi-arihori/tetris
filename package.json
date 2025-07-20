@@ -1,0 +1,23 @@
+{
+    "name": "tetris-game",
+    "version": "1.0.0",
+    "description": "A Tetris game built with vanilla JavaScript",
+    "main": "index.html",
+    "scripts": {
+        "dev": "vercel dev",
+        "build": "echo 'No build step required for static site'",
+        "start": "vercel dev"
+    },
+    "keywords": [
+        "tetris",
+        "game",
+        "javascript",
+        "html5",
+        "canvas"
+    ],
+    "author": "Takeshi Arihori",
+    "license": "MIT",
+    "devDependencies": {
+        "vercel": "^32.0.0"
+    }
+}
